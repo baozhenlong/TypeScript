@@ -1,0 +1,12 @@
+// --- 模块
+// 模块是在其自身的作用域里执行，并不是在全局作用域
+// 这意味着定义在模块里面的变量、函数和类等在模块外是不可见的
+// 除非明确地使用 export 导出它们
+// 类似地，必须通过 import 导入其他模块导出的变量、函数、类等
+// 两个模块之间的关系是通过在文件级别上使用 import 和 export 建立的
+
+// 模块导出，使用 export 关键字
+export interface SomeInterface { }
+
+// 模块导入，使用 import 关键字
+import someInterfaceRef = require('./module');
