@@ -132,3 +132,8 @@
     y = x;
 }
 
+// 11 --- Object
+{
+    // 非原始类型，也就是除 number, string, boolean, symbol, null, undefined 之外的类型
+}
+
