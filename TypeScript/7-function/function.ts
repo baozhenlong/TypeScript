@@ -1,4 +1,4 @@
-// --- 函数
+// 函数
 // 函数是一组一起执行一个任务的语句
 // 函数声明告诉编译器函数的名称、返回类型、参数
 // 函数定义提供了函数的实际主体
@@ -6,8 +6,12 @@
 // 1 --- 函数定义
 {
     // 函数就是包裹在花括号中的代码块，前面使用了关键字 function
-    // function functionName() { }
-    function log() { } // 函数定义
+    // function funcName(param: type): returnType {}
+    function add(x: number, y: number): number {
+        return x + y;
+    }
+    let myAdd: (baseValue: number, increment: number) => number = function (x: number, y: number): number { return x + y; };
+    // 函数类型包含两部分：参数类型和返回值类型
 }
 
 // 2 --- 调用函数
@@ -44,14 +48,17 @@
     // function functionName(param1 [: type], param2 [: type]) { }
     // paramX 参数名
     // type 参数类型
-    function add(x: number, y: number) {
+    function addT(x: number, y: number) {
         return x + y;
     }
-    console.log('[带参数函数]---add', add(1, 2)); // 3
+    console.log('[带参数函数]---addT', addT(1, 2)); // 3
 }
 
 // 5 --- 可选参数和默认参数
 {
+    // TypeScript 里的每个函数参数都是必须的，编译器检查用户是否为每个参数都传入了值
+    // 传递给一个函数的参数个数必须与期望的参数个数一致
+    // JavaScript 里的每个函数参数都是可选的，可传可不传；没传参时，它的值就是 undefined
     // 可选参数
     {
         // 可选参数用问号 ( ? ) 标识
@@ -69,14 +76,21 @@
     // 默认参数
     {
         // 设置参数的默认值，这样在调用函数的时候，如果不传入该参数的值，则使用默认参数
+        // 默认参数是可选的
         // function functionName(param1 [: type], param2 [: type] = defaultValue) { }
-        // 注意：参数不能同时设置为可选和默认
         function caculateDiscount(price: number, rate: number = 0.5) {
             console.log('[默认参数]---discount', price * rate);
         }
         caculateDiscount(100); // 50
         caculateDiscount(100, 0.3); // 30
+        // 与普通可选参数不同，带默认值的参数不需要放在必须参数的后面
+        // 如果默认参数出现在必须参数前面，用户必须明确传入 undefined 值来获得默认值
+        function printMsg(content: string = '空', title: string) {
+            console.log('[默认参数]---title =', title, ', msg =', content);
+        }
+        printMsg(undefined, 'msg');// title = msg , msg = 空
     }
+    // 注意：参数不能同时设置为可选和默认
 }
 
 // 6 --- 剩余参数
@@ -156,7 +170,7 @@
     }
     console.log('[Lambda 函数]---addTo10', addTo10(100)); // 110
     // 单个参数 () 是可选的
-    let display = x => {
+    let display = (x: number) => {
         console.log('[Lambda 函数]---单个参数', x);
     };
     display(1); // 1
@@ -200,4 +214,73 @@
     disp(1, 'xyz');
     // 1
     // xyz
+}
+
+// 12 --- this 和箭头函数
+{
+    let actor = {
+        types: ['move', 'jump', 'sit', 'run'],
+        createAction: function () {
+            return function () {
+                let index = Math.floor(Math.random() * 4);
+                return {
+                    index,
+                    type: this.types[index]
+                };
+            };
+        }
+    };
+    let action = actor.createAction();
+    // action();
+    // 报错： createAction 返回的函数里的 this 被设置成了 window 而不是 actor 对象
+    // 顶级的非方法式调用会将 this 视为 window ；在严格模式下， this 为 undefined
+    // 箭头函数能保存函数创建时的 this 值，而不是调用时的值
+    actor = {
+        types: ['move', 'jump', 'sit', 'run'],
+        createAction: function () {
+            return () => {
+                let index = Math.floor(Math.random() * 4);
+                return {
+                    index,
+                    type: this.types[index]
+                };
+            };
+        }
+    };
+    action = actor.createAction();
+    action();
+    // this 参数
+    {
+        // 不幸的是， this.type[index] 的类型依旧为 any；这是因为 this 来自对象字面量里的函数表达式
+        interface Action {
+            type: string;
+            index: number;
+        }
+        // 提供一个显式的 this 参数； this 参数是个假的参数，它出现在参数列表的最前面
+        interface Actor {
+            types: string[];
+            indexs: number[];
+            createAction(this: Actor, desc: string): () => Action
+        }
+        let actor: Actor = {
+            types: ['move', 'jump', 'sit', 'run'],
+            indexs: [0, 1, 2, 3],
+            createAction: function (this: Actor, desc: string) {
+                return () => {
+                    let index = Math.floor(Math.random() * 4);
+                    console.log('[this 参数]---desc', desc);
+                    return {
+                        index,
+                        type: this.types[index]
+                    }
+                };
+            }
+        };
+        let action = actor.createAction('hi');
+        action(); // hi
+    }
+    // this 参数在回调函数里
+    {
+        // 当将回调函数被调用时，会被当成一个普通函数调用， this 将为 undefined
+    }
 }
