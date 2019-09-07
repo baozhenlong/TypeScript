@@ -7,7 +7,7 @@
 {
     // 函数就是包裹在花括号中的代码块，前面使用了关键字 function
     // function funcName(param: type): returnType {}
-    function add(x: number, y: number): number {
+    function addTest(x: number, y: number): number {
         return x + y;
     }
     let myAdd: (baseValue: number, increment: number) => number = function (x: number, y: number): number { return x + y; };
